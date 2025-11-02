@@ -1,0 +1,51 @@
+[
+    {
+        "name": "Happier",
+        "link": "https://www.dropbox.com/s/zp1xfir101y4sc3/happier.mp3?raw=1",
+        "artists": "Marshmello",
+        "image": "https://www.dropbox.com/s/xxmwcz14hkn7iwl/happier.png?raw=1",
+        "Mood": "Happy"
+    },
+    {
+        "name": "Stay",
+        "link": "https://www.dropbox.com/s/umam9olakop001d/stay.mp3?raw=1",
+        "artists": "Justin Bieber",
+        "image": "https://www.dropbox.com/s/kierj5lzst1yx9n/stay.jpg?raw=1",
+        "Mood": "Romantic"
+    },
+    {
+        "name": "Perfect",
+        "link": "https://www.dropbox.com/s/3mjzj73400sxovk/perfect.mp3?raw=1",
+        "artists": "Ed Sheeran",
+        "image": "https://www.dropbox.com/s/crlthbozdznb13g/perfect.jpeg?raw=1",
+        "Mood": "Romantic"
+    },
+    {
+        "name": "7 Rings",
+        "link": "https://www.dropbox.com/s/yo5tcfdjoz95ozf/7-rings.mp3?raw=1",
+        "artists": "Ariana Grande",
+        "image": "https://www.dropbox.com/s/gobvfxj4r0t053v/7-rings.jpg?raw=1",
+        "Mood": "Happy"
+    },
+    {
+        "name": "Girls Like You",
+        "link": "https://www.dropbox.com/s/yi1cpg16snrl3fc/girls-like-you.mp3?raw=1",
+        "artists": "Maroon 5",
+        "image": "https://www.dropbox.com/s/ouq5zzgbqsk9zx0/girls-like-you.png?raw=1",
+        "Mood": "Romantic"
+    },
+    {
+        "name": "Denial",
+        "link": "https://www.dropbox.com/scl/fi/vo71iargv4ly9tw5x34he/Denial-Sevendust-HQ.wav?rlkey=ci8ep5jgtisa81o8zz47dkfbq&st=xugfcctg&raw=1",
+        "artists": "Sevendust",
+        "image": "https://drive.google.com/file/d/1anhCfoI1xgPwh0k6EneUnrbgi7QiWXyP/view?usp=drive_link",
+        "Mood": "Angry"
+    },
+    {
+        "name": "Easier if we fly",
+        "link": "https://www.dropbox.com/scl/fi/m1h9di22zw3w11gxovqd1/Dispatch-Easier-if-we-fly-song..wav?rlkey=l1bc74lrr8ht8zi1e5mb12qqt&st=nw9yky11&raw=1",
+        "artists": "Dispatch",
+        "image": "https://drive.google.com/file/d/1anhCfoI1xgPwh0k6EneUnrbgi7QiWXyP/view?usp=drive_link",
+        "Mood": "Calm"
+    }
+]

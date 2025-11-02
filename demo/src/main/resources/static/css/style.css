@@ -1,0 +1,161 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary-color: #0170fe;
+  --secondary-color: #11d2d9;
+  --white-color: #fff;
+}
+
+body {
+  font-family: Poppins, sans-serif;
+  min-height: 100vh;
+  background-image: url("/images/background.jpg");
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column; /* pour empiler le select + le player */
+}
+
+/* === Menu de sélection des chansons === */
+#songSelector {
+  width: 90%;
+  max-width: 350px;
+  padding: 10px 14px;
+  margin-bottom: 25px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white-color);
+  font-size: 15px;
+  backdrop-filter: blur(10px);
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+#songSelector:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#songSelector option {
+  color: #000;
+}
+
+/* === Player principal === */
+.player {
+  width: 100%;
+  max-width: 350px;
+  backdrop-filter: blur(40px);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  padding: 60px 40px;
+  border-radius: 10px;
+}
+
+img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+}
+
+.thumbnail {
+  background-image: linear-gradient(120deg, var(--secondary-color), var(--primary-color));
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+img.play {
+  animation: 15s rotate linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.details {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.details span {
+  font-size: 15px;
+  margin-top: 5px;
+}
+
+.time {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-bar {
+  margin: 10px 0 30px;
+  width: 100%;
+  appearance: none;
+  height: 6px;
+  cursor: pointer;
+}
+
+.progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background-image: linear-gradient(120deg, var(--secondary-color), var(--primary-color));
+  transition: 0.2s ease-in-out;
+}
+
+.action {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.action button {
+  width: 60px;
+  height: 60px;
+  background-color: var(--white-color);
+  border-radius: 50%;
+  border: 2px solid var(--white-color);
+  cursor: pointer;
+}
+
+.action button.prev-play:hover,
+.action button.next-play:hover {
+  background-color: #eee;
+}
+
+.action button iconify-icon {
+  font-size: 20px;
+}
+
+.action button.play {
+  background-image: linear-gradient(120deg, var(--secondary-color), var(--primary-color));
+  color: var(--white-color);
+}
+
+.action button.prev-play iconify-icon,
+.action button.next-play iconify-icon {
+  color: var(--primary-color);
+}
+
+.hidden {
+  display: none;
+}

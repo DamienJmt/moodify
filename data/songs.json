@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "title": "Lofi Sunset",
+    "artist": "DJ Soft",
+    "album": "Beats",
+    "pathOrUrl": "/audio/lofi-sunset.mp3",
+    "durationSec": 180,
+    "moods": [
+      "chill",
+      "relax"
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Power Run",
+    "artist": "Volt",
+    "album": "Gym",
+    "pathOrUrl": "/audio/power-run.mp3",
+    "durationSec": 210,
+    "moods": [
+      "energetic",
+      "focus"
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Melancholy",
+    "artist": "Ari",
+    "album": "Night",
+    "pathOrUrl": "/audio/melancholy.mp3",
+    "durationSec": 200,
+    "moods": [
+      "sad",
+      "calm"
+    ]
+  }
+]

@@ -19,6 +19,17 @@
         <option value="">-- Choisir une chanson --</option>
     </select>
 
+    <!-- Sélecteur d’humeur -->
+    <select id="moodSelector">
+        <option value="">-- Choisir une humeur --</option>
+        <option value="Happy">Happy</option>
+        <option value="Romantic">Romantic</option>
+        <option value="Angry">Angry</option>
+        <option value="Calm">Calm</option>
+    </select>
+
+
+
     <!-- Lecteur -->
     <div class="player">
         <div class="thumbnail">
@@ -27,6 +38,7 @@
         <div class="details">
             <h3 id="title">Titre</h3>
             <span id="artist">Artiste</span>
+            
         </div>
         <audio id="song">
             <source src="" type="audio/mp3">
@@ -46,6 +58,15 @@
             </button>
             <button class="next-play">
                 <iconify-icon icon="iconoir:skip-next-solid"></iconify-icon>
+            </button>
+            <p id="volumeLabel">Volume : 100%</p>
+
+            <!-- 🔉 Boutons de volume -->
+            <button id="volumeDown" title="Baisser le volume">
+                <iconify-icon icon="iconoir:sound-low"></iconify-icon>
+            </button>
+            <button id="volumeUp" title="Augmenter le volume">
+                <iconify-icon icon="iconoir:sound-high"></iconify-icon>
             </button>
         </div>
     </div>

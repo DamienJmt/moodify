@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+</head>
+<body>
+
+    <!-- Sélecteur de chansons -->
+    <select id="songSelector">
+        <option value="">-- Choisir une chanson --</option>
+    </select>
+
+    <!-- Sélecteur d’humeur -->
+    <select id="moodSelector">
+        <option value="">-- Choisir une humeur --</option>
+        <option value="Happy">Happy</option>
+        <option value="Romantic">Romantic</option>
+        <option value="Angry">Angry</option>
+        <option value="Calm">Calm</option>
+    </select>
+
+
+
+    <!-- Lecteur -->
+    <div class="player">
+        <div class="thumbnail">
+            <img th:src="@{/images/default-thumb.png}" id="thumb" alt="Thumbnail">
+        </div>
+        <div class="details">
+            <h3 id="title">Titre</h3>
+            <span id="artist">Artiste</span>
+            
+        </div>
+        <audio id="song">
+            <source src="" type="audio/mp3">
+        </audio>
+        <div class="time">
+            <span id="start">00:00</span>
+            <span id="end">00:00</span>
+        </div>
+        <input type="range" class="progress-bar" id="progress" value="0" max="0">
+        <div class="action">
+            <button class="prev-play">
+                <iconify-icon icon="iconoir:skip-prev-solid"></iconify-icon>
+            </button>
+            <button class="play" id="play">
+                <iconify-icon icon="iconoir:play-solid" class="icon-play"></iconify-icon>
+                <iconify-icon icon="iconoir:pause-solid" class="icon-pause hidden"></iconify-icon>
+            </button>
+            <button class="next-play">
+                <iconify-icon icon="iconoir:skip-next-solid"></iconify-icon>
+            </button>
+        </div>
+
+        <!-- Bloc volume séparé -->
+        <div class="volume-control">
+            <p id="volumeLabel">Volume : 100%</p>
+            <button id="volumeDown" title="Baisser le volume">
+                <iconify-icon icon="iconoir:sound-low"></iconify-icon>
+            </button>
+            <button id="volumeUp" title="Augmenter le volume">
+                <iconify-icon icon="iconoir:sound-high"></iconify-icon>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- JS -->
+    <script type="module" th:src="@{/js/script.js}"></script>
+
+</body>
+</html>

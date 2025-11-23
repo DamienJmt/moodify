@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class MusicPlayerController {
@@ -17,64 +18,58 @@ public class MusicPlayerController {
         this.playlistManager = playlistManager;
     }
 
-    // Liste complete
+    // 🎵 Liste complète
     @GetMapping("/api/songs")
     public List<Song> getSongs() {
         return playlistManager.getAllSongs();
     }
 
-    // Chanson actuelle
+    // 🎧 Chanson actuelle
     @GetMapping("/api/songs/current")
     public Song getCurrentSong() {
         return playlistManager.getCurrentSong();
     }
 
-    // Suivante
+    // ⏭️ Suivante
     @GetMapping("/api/songs/next")
     public Song nextSong() {
-        playlistManager.nextSong();
-        return playlistManager.getCurrentSong();
+        return playlistManager.nextSong();
     }
 
-    // Precedente
+    // ⏮️ Précédente
     @GetMapping("/api/songs/prev")
     public Song prevSong() {
-        playlistManager.prevSong();
-        return playlistManager.getCurrentSong();
+        return playlistManager.prevSong();
     }
 
-    // Selection par index
+    // ▶️ Choisir une chanson par index
     @GetMapping("/api/songs/select/{index}")
     public Song selectSong(@PathVariable int index) {
         playlistManager.selectSong(index);
         return playlistManager.getCurrentSong();
     }
 
-    // Selection aleatoire selon le mood (avec anti-repeat)
+    // 💫 Sélection aléatoire selon le mood (anti-repeat)
     @GetMapping("/api/songs/mood/{mood}")
     public Song getRandomSongByMood(@PathVariable String mood) {
-        return playlistManager
-                .getRandomSongByMood(mood)
-                .map(song -> {
-                    int index = playlistManager.getAllSongs().indexOf(song);
-                    if (index >= 0) playlistManager.selectSong(index);
-                    return song;
-                })
-                .orElse(null);
+        if (mood == null || mood.isBlank()) return null;
+        Optional<Song> pick = playlistManager.getRandomSongByMood(mood);
+        pick.ifPresent(s -> playlistManager.selectSong(playlistManager.getAllSongs().indexOf(s)));
+        return pick.orElse(null);
     }
 
-    // Baisser le volume de la chanson actuelle
+    // 🔉 Baisser le volume
     @GetMapping("/api/songs/volume/decrease/{amount}")
     public Song decreaseVolume(@PathVariable int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Le montant doit etre positif.");
+        if (amount <= 0) throw new IllegalArgumentException("Le montant doit être positif.");
         playlistManager.decreaseVolume(amount);
         return playlistManager.getCurrentSong();
     }
 
-    // Augmenter le volume de la chanson actuelle
+    // 🔊 Augmenter le volume
     @GetMapping("/api/songs/volume/increase/{amount}")
     public Song increaseVolume(@PathVariable int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Le montant doit etre positif.");
+        if (amount <= 0) throw new IllegalArgumentException("Le montant doit être positif.");
         playlistManager.increaseVolume(amount);
         return playlistManager.getCurrentSong();
     }

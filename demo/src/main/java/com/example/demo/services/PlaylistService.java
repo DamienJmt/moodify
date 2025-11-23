@@ -2,39 +2,46 @@ package com.example.demo.services;
 
 import com.example.demo.models.Playlist;
 import com.example.demo.models.Song;
-import com.example.demo.repo.SongRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Custom playlists generated from moods.
+ * Stored in-memory for now.
+ */
 @Service
 public class PlaylistService {
-    private final SongRepository repo;
 
-    public PlaylistService(SongRepository repo) {
-        this.repo = repo;
+    private final PlaylistManager playlistManager;
+    private final Map<String, Playlist> playlists = new LinkedHashMap<>();
+
+    public PlaylistService(PlaylistManager playlistManager) {
+        this.playlistManager = playlistManager;
     }
 
-    public Playlist createByMoods(String name, String description, Collection<String> moods) {
-        Playlist p = new Playlist(UUID.randomUUID().toString(), name, description);
-        List<Song> all = repo.findAll();
-        Set<String> wanted = moods == null
-                ? Set.of()
-                : moods.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    public Playlist createPlaylist(String name, String description, Set<String> moods) {
+        if (moods == null) moods = Set.of();
+        List<Song> selected = playlistManager.getAllSongs().stream()
+                .filter(s -> moods.isEmpty() || moods.stream().anyMatch(s::hasMood))
+                .collect(Collectors.toList());
 
-        for (Song s : all) {
-            boolean match = wanted.isEmpty() || s.getMoods().stream().map(String::toLowerCase).anyMatch(wanted::contains);
-            if (match) p.addSong(s);
-        }
-        return p;
+        String id = UUID.randomUUID().toString();
+        Playlist pl = new Playlist(id, name, description, selected);
+        playlists.put(id, pl);
+        return pl;
     }
 
-    public Playlist createManual(String name, String description, Collection<String> songIds) {
-        Playlist p = new Playlist(UUID.randomUUID().toString(), name, description);
-        if (songIds != null) {
-            for (String id : songIds) repo.findById(id).ifPresent(p::addSong);
-        }
-        return p;
+    public List<Playlist> listPlaylists() {
+        return new ArrayList<>(playlists.values());
+    }
+
+    public Playlist getPlaylist(String id) {
+        return playlists.get(id);
+    }
+
+    public boolean deletePlaylist(String id) {
+        return playlists.remove(id) != null;
     }
 }

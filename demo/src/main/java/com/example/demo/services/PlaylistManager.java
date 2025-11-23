@@ -5,24 +5,20 @@ import com.example.demo.models.Song;
 import com.example.demo.repo.SongRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
-/**
- * PlaylistManager compatible avec la branche luca,
- * mais basé sur la repo et RecommendationService de la refonte.
- */
 @Service
 public class PlaylistManager {
 
-    private final SongRepository repo;
-    private final RecommendationService recommendationService;
     private final Playlist playlist;
+    private final RecommendationService recommendationService;
 
-    public PlaylistManager(SongRepository repo, RecommendationService recommendationService) {
-        this.repo = repo;
+    public PlaylistManager(SongRepository songRepository,
+                           RecommendationService recommendationService) {
         this.recommendationService = recommendationService;
-        this.playlist = new Playlist(repo.findAll());
+        List<Song> songs = songRepository.findAll();
+        this.playlist = new Playlist(songs);
     }
 
     public List<Song> getAllSongs() {
@@ -33,16 +29,16 @@ public class PlaylistManager {
         return playlist.getCurrentSong();
     }
 
-    public void nextSong() {
-        playlist.next();
+    public Song nextSong() {
+        return playlist.nextSong();
     }
 
-    public void prevSong() {
-        playlist.prev();
+    public Song prevSong() {
+        return playlist.prevSong();
     }
 
     public void selectSong(int index) {
-        playlist.select(index);
+        playlist.selectSong(index);
     }
 
     public List<Song> getSongsByMood(String mood) {
@@ -54,22 +50,18 @@ public class PlaylistManager {
     }
 
     public Optional<Song> getRandomSongByMood(String mood) {
-        if (mood == null || mood.isBlank()) return Optional.empty();
-        List<Song> filtered = repo.findAll().stream()
-                .filter(s -> s.hasMood(mood))
-                .collect(Collectors.toList());
-        return recommendationService.pickNext(filtered);
-    }
-
-    public void decreaseVolume(int amount) {
-        Song current = getCurrentSong();
-        if (current == null) return;
-        current.setVolume(current.getVolume() - amount);
+        return recommendationService.pickNext(getSongsByMood(mood));
     }
 
     public void increaseVolume(int amount) {
         Song current = getCurrentSong();
         if (current == null) return;
         current.setVolume(current.getVolume() + amount);
+    }
+
+    public void decreaseVolume(int amount) {
+        Song current = getCurrentSong();
+        if (current == null) return;
+        current.setVolume(current.getVolume() - amount);
     }
 }

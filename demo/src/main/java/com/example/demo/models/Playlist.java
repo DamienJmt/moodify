@@ -4,80 +4,79 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Playlist enrichie (refonte) + compat luca.
+ * Playback playlist + custom playlists (refonte).
+ * Keeps luca public API for compatibility.
  */
 public class Playlist {
     private String id;
     private String name;
     private String description;
+
     private final List<Song> songs = new ArrayList<>();
-    private int currentIndex = -1;
+    private int currentIndex = 0;
 
     public Playlist() {}
 
-    // constructeur luca historique
+    // luca constructor
     public Playlist(List<Song> songs) {
         if (songs != null) this.songs.addAll(songs);
         if (!this.songs.isEmpty()) currentIndex = 0;
     }
 
-    public Playlist(String id, String name, String description) {
+    // refonte-style constructor
+    public Playlist(String id, String name, String description, List<Song> songs) {
         this.id = id;
         this.name = name;
         this.description = description;
+        if (songs != null) this.songs.addAll(songs);
+        if (!this.songs.isEmpty()) currentIndex = 0;
     }
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-
-    public List<Song> getSongs() { return Collections.unmodifiableList(songs); }
-
-    public void addSong(Song s) {
-        if (s == null) return;
-        songs.add(s);
-        if (currentIndex == -1) currentIndex = 0;
-    }
-
-    public void removeSong(Song s) {
-        songs.remove(s);
-        if (songs.isEmpty()) currentIndex = -1;
-        else currentIndex = Math.min(currentIndex, songs.size() - 1);
-    }
+    public List<Song> getSongs() { return songs; }
 
     public Song getCurrentSong() {
-        if (songs.isEmpty() || currentIndex < 0) return null;
+        if (songs.isEmpty()) return null;
+        currentIndex = Math.max(0, Math.min(currentIndex, songs.size() - 1));
         return songs.get(currentIndex);
     }
 
-    public Optional<Song> getCurrentSongOpt() {
-        return Optional.ofNullable(getCurrentSong());
+    public Song nextSong() {
+        if (songs.isEmpty()) return null;
+        currentIndex = (currentIndex + 1) % songs.size();
+        return songs.get(currentIndex);
     }
 
-    public void next() {
-        if (!songs.isEmpty()) currentIndex = (currentIndex + 1) % songs.size();
+    public Song prevSong() {
+        if (songs.isEmpty()) return null;
+        currentIndex = (currentIndex - 1 + songs.size()) % songs.size();
+        return songs.get(currentIndex);
     }
 
-    public void prev() {
-        if (!songs.isEmpty()) currentIndex = (currentIndex - 1 + songs.size()) % songs.size();
+    public void selectSong(int index) {
+        if (songs.isEmpty()) return;
+        currentIndex = Math.max(0, Math.min(index, songs.size() - 1));
     }
-
-    public void select(int index) {
-        if (index >= 0 && index < songs.size()) currentIndex = index;
-    }
-
-    // ---- Mood helpers (compat luca) ----
 
     public List<Song> getByMood(String mood) {
-        if (mood == null) return List.of();
-        return songs.stream().filter(s -> s.hasMood(mood)).collect(Collectors.toList());
+        return songs.stream()
+                .filter(song -> song != null && song.hasMood(mood))
+                .collect(Collectors.toList());
     }
 
     public void selectByMood(String mood) {
         List<Song> filtered = getByMood(mood);
-        if (!filtered.isEmpty()) currentIndex = songs.indexOf(filtered.get(0));
+        if (!filtered.isEmpty()) {
+            currentIndex = songs.indexOf(filtered.get(0));
+        }
     }
+
+    // ----- refonte fields getters/setters -----
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

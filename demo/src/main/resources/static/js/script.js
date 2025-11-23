@@ -14,6 +14,8 @@ async function initPlayer() {
   const song = document.querySelector("#song");
   const title = document.querySelector("#title");
   const artist = document.querySelector("#artist");
+  const moodsBox = document.querySelector("#moods");
+  const metadataBox = document.querySelector("#metadata");
   const thumb = document.querySelector("#thumb");
   const progress = document.querySelector("#progress");
   const start = document.querySelector("#start");
@@ -54,6 +56,17 @@ async function initPlayer() {
     title.textContent = track.name;
     artist.textContent = track.artists;
     thumb.src = track.image;
+    // Affichage des moods multiples
+    const moods = track.moods || (track.mood ? [track.mood] : []);
+    if (moodsBox) {
+      moodsBox.innerHTML = moods.map(m => `<span class="mood-tag">${m}</span>`).join("");
+    }
+    // Affichage metadata simple
+    if (metadataBox) {
+      const md = track.metadata || {};
+      const entries = Object.entries(md);
+      metadataBox.innerHTML = entries.length ? entries.map(([k,v]) => `<span class="meta-item">${k}: ${v}</span>`).join(" | ") : "";
+    }
     start.textContent = "00:00";
     end.textContent = "00:00";
     clearInterval(interval);

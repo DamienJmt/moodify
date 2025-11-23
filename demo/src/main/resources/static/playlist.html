@@ -7,7 +7,6 @@
 
   <link rel="stylesheet" href="/css/style.css" />
   <style>
-    /* small local styles to avoid touching global css too much */
     .playlist-card { border:1px solid #ddd; padding:12px; border-radius:10px; margin:10px 0; background:#fff; }
     .playlist-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .playlist-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
@@ -23,10 +22,9 @@
   <h1>🎵 Gestion des Playlists</h1>
 
   <div style="margin-bottom:12px;">
-    <a href="/index.html" class="btn-playlists">← Retour au lecteur</a>
+    <a th:href="@{/}" class="btn-playlists">← Retour au lecteur</a>
   </div>
 
-  <!-- Création playlist -->
   <section class="create-playlist">
     <h2>Créer une playlist</h2>
     <form id="createPlaylistForm">
@@ -51,13 +49,11 @@
     </form>
   </section>
 
-  <!-- Liste playlists -->
   <section class="playlists-list">
     <h2>Playlists existantes</h2>
     <div id="playlistsContainer"></div>
   </section>
 
-  <!-- Gestion d'une playlist -->
   <section id="managePanel" class="manage-panel hidden">
     <h2 id="manageTitle">Playlist</h2>
     <p id="manageDescription"></p>
@@ -91,6 +87,14 @@
 
     let currentPlaylistId = null;
 
+    // ✅ FIX compat luca/refonte : artists peut être string, array, ou absent
+    function artistsText(s) {
+      if (s.artist) return s.artist; // nouveau modèle
+      if (Array.isArray(s.artists)) return s.artists.join(", "); // ancien modèle array
+      if (typeof s.artists === "string") return s.artists; // ancien modèle string
+      return "";
+    }
+
     async function loadPlaylists() {
       const res = await fetch("/api/playlists");
       const playlists = await res.json();
@@ -101,21 +105,20 @@
         return;
       }
 
-      playlists.forEach(pl => {
+      playlists.forEach(function(pl) {
         const div = document.createElement("div");
         div.className = "playlist-card";
 
-        const moods = (pl.moods || []).map(m => `<span class="tag">${m}</span>`).join(" ");
-        div.innerHTML = \`
-          <h3>\${pl.name}</h3>
-          <p>\${pl.description || "Aucune description"}</p>
-          <div>\${moods || "<em>Aucune humeur</em>"}</div>
-          <p><strong>Musiques :</strong> \${(pl.songs || []).length}</p>
-          <div class="playlist-actions">
-            <button onclick="openPlaylist('\${pl.id}')">Ouvrir</button>
-            <button onclick="deletePlaylist('\${pl.id}')">Supprimer</button>
-          </div>
-        \`;
+        const moods = (pl.moods || []).map(function(m){ return '<span class="tag">' + m + '</span>'; }).join(" ");
+        div.innerHTML =
+          '<h3>' + pl.name + '</h3>' +
+          '<p>' + (pl.description || "Aucune description") + '</p>' +
+          '<div>' + (moods || "<em>Aucune humeur</em>") + '</div>' +
+          '<p><strong>Musiques :</strong> ' + ((pl.songs || []).length) + '</p>' +
+          '<div class="playlist-actions">' +
+            '<button onclick="openPlaylist(\'' + pl.id + '\')">Ouvrir</button>' +
+            '<button onclick="deletePlaylist(\'' + pl.id + '\')">Supprimer</button>' +
+          '</div>';
 
         playlistsContainer.appendChild(div);
       });
@@ -123,13 +126,13 @@
 
     async function openPlaylist(id) {
       currentPlaylistId = id;
-      const res = await fetch(\`/api/playlists/\${id}\`);
+      const res = await fetch("/api/playlists/" + id);
       if (res.status === 404) return;
       const pl = await res.json();
 
       manageTitle.textContent = pl.name;
       manageDescription.textContent = pl.description || "";
-      manageMoods.innerHTML = (pl.moods || []).map(m => \`<span class="tag">\${m}</span>\`).join(" ");
+      manageMoods.innerHTML = (pl.moods || []).map(function(m){ return '<span class="tag">' + m + '</span>'; }).join(" ");
 
       renderSongs(pl);
       await loadCandidates();
@@ -146,30 +149,31 @@
         return;
       }
 
-      songs.forEach(s => {
+      songs.forEach(function(s) {
         const item = document.createElement("div");
         item.className = "song-item";
-        item.innerHTML = \`
-          <div>
-            <strong>\${s.title || s.name}</strong>
-            <span style="opacity:.7"> — \${s.artist || (s.artists ? s.artists.join(", ") : "")}</span>
-          </div>
-          <div class="remove-song" title="Supprimer">✖</div>
-        \`;
-        item.querySelector(".remove-song").addEventListener("click", async () => {
-          const ok = confirm("Supprimer cette musique de la playlist ?");
-          if (!ok) return;
-          await fetch(\`/api/playlists/\${currentPlaylistId}/songs/\${s.id}\`, { method: "DELETE" });
+        item.innerHTML =
+          '<div>' +
+            '<strong>' + (s.title || s.name) + '</strong>' +
+            // ✅ remplacement join -> artistsText
+            '<span style="opacity:.7"> — ' + artistsText(s) + '</span>' +
+          '</div>' +
+          '<div class="remove-song" title="Supprimer">✖</div>';
+
+        item.querySelector(".remove-song").addEventListener("click", async function() {
+          if (!confirm("Supprimer cette musique de la playlist ?")) return;
+          await fetch("/api/playlists/" + currentPlaylistId + "/songs/" + s.id, { method: "DELETE" });
           openPlaylist(currentPlaylistId);
           loadPlaylists();
         });
+
         songsContainer.appendChild(item);
       });
     }
 
     async function loadCandidates() {
       if (!currentPlaylistId) return;
-      const res = await fetch(\`/api/playlists/\${currentPlaylistId}/candidates\`);
+      const res = await fetch("/api/playlists/" + currentPlaylistId + "/candidates");
       const candidates = await res.json();
 
       candidateSelect.innerHTML = "";
@@ -186,31 +190,32 @@
       candidateSelect.disabled = false;
       addSelectedSongBtn.disabled = false;
 
-      candidates.forEach(s => {
+      candidates.forEach(function(s) {
         const opt = document.createElement("option");
         opt.value = s.id;
-        opt.textContent = \`\${s.title || s.name} — \${s.artist || (s.artists ? s.artists.join(", ") : "")}\`;
+        // ✅ remplacement join -> artistsText
+        opt.textContent = (s.title || s.name) + " - " + artistsText(s);
         candidateSelect.appendChild(opt);
       });
     }
 
-    showAddSongBtn.addEventListener("click", async () => {
+    showAddSongBtn.addEventListener("click", async function() {
       addSongBox.classList.toggle("hidden");
       if (!addSongBox.classList.contains("hidden")) {
         await loadCandidates();
       }
     });
 
-    addSelectedSongBtn.addEventListener("click", async () => {
+    addSelectedSongBtn.addEventListener("click", async function() {
       const songId = candidateSelect.value;
       if (!songId) return;
-      await fetch(\`/api/playlists/\${currentPlaylistId}/songs/\${songId}\`, { method: "POST" });
+      await fetch("/api/playlists/" + currentPlaylistId + "/songs/" + songId, { method: "POST" });
       openPlaylist(currentPlaylistId);
       loadPlaylists();
     });
 
     async function deletePlaylist(id) {
-      await fetch(\`/api/playlists/\${id}\`, { method: "DELETE" });
+      await fetch("/api/playlists/" + id, { method: "DELETE" });
       if (currentPlaylistId === id) {
         managePanel.classList.add("hidden");
         currentPlaylistId = null;
@@ -218,17 +223,17 @@
       loadPlaylists();
     }
 
-    document.getElementById("createPlaylistForm").addEventListener("submit", async (e) => {
+    document.getElementById("createPlaylistForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const name = document.getElementById("playlistName").value;
       const description = document.getElementById("playlistDescription").value;
       const moods = Array.from(document.getElementById("playlistMoods").selectedOptions)
-        .map(o => o.value);
+        .map(function(o){ return o.value; });
 
       await fetch("/api/playlists", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, description, moods })
+        body: JSON.stringify({ name: name, description: description, moods: moods })
       });
 
       e.target.reset();

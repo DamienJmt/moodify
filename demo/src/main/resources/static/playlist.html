@@ -18,299 +18,299 @@
     .hidden { display:none; }
 
     /* === Palette basée sur ton fond pastel === */
-  :root{
-    --bg-1: rgba(255, 255, 255, 0.10);
-    --bg-2: rgba(255, 255, 255, 0.18);
-    --card: rgba(255, 255, 255, 0.75);
-    --card-strong: rgba(255, 255, 255, 0.9);
-    --text: #1f1f2e;
-    --muted: #5c5c78;
-    --accent: #7b6cff;     /* violet doux */
-    --accent-2: #ff8ccf;   /* rose doux */
-    --accent-3: #6cc7ff;   /* bleu doux */
-    --danger: #ff6b6b;
-    --radius: 14px;
-    --shadow: 0 10px 30px rgba(22, 18, 55, 0.12);
-  }
+    :root{
+      --bg-1: rgba(255, 255, 255, 0.10);
+      --bg-2: rgba(255, 255, 255, 0.18);
+      --card: rgba(255, 255, 255, 0.75);
+      --card-strong: rgba(255, 255, 255, 0.9);
+      --text: #1f1f2e;
+      --muted: #5c5c78;
+      --accent: #7b6cff;     /* violet doux */
+      --accent-2: #ff8ccf;   /* rose doux */
+      --accent-3: #6cc7ff;   /* bleu doux */
+      --danger: #ff6b6b;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(22, 18, 55, 0.12);
+    }
 
-  /* === Layout global === */
-  body{
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    color: var(--text);
-    margin: 0;
-    padding: 30px 16px 60px;
-    background: transparent; /* ton fond est déjà sur index */
-  }
+    /* === Layout global === */
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      margin: 0;
+      padding: 30px 16px 60px;
+      background: transparent; /* ton fond est déjà sur index */
+    }
 
-  h1, h2, h3{
-    text-align: center;
-    letter-spacing: .3px;
-  }
+    h1, h2, h3{
+      text-align: center;
+      letter-spacing: .3px;
+    }
 
-  h1{
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 18px;
-    text-shadow: 0 2px 8px rgba(255,255,255,0.6);
-  }
+    h1{
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      text-shadow: 0 2px 8px rgba(255,255,255,0.6);
+    }
 
-  section{
-    width: min(920px, 100%);
-    margin: 0 auto 18px;
-    padding: 14px;
-    border-radius: var(--radius);
-    background: var(--bg-1);
-    backdrop-filter: blur(6px);
-  }
+    section{
+      width: min(920px, 100%);
+      margin: 0 auto 18px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: var(--bg-1);
+      backdrop-filter: blur(6px);
+    }
 
-  /* === Bouton retour === */
-  .btn-playlists{
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--bg-2);
-    color: var(--text);
-    text-decoration: none;
-    font-weight: 600;
-    box-shadow: var(--shadow);
-    transition: transform .12s ease, background .12s ease;
-  }
-  .btn-playlists:hover{
-    transform: translateY(-1px);
-    background: rgba(255,255,255,0.28);
-  }
+    /* === Bouton retour === */
+    .btn-playlists{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--bg-2);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      transition: transform .12s ease, background .12s ease;
+    }
+    .btn-playlists:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.28);
+    }
 
-  /* === Form création === */
-  .create-playlist form{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
-    gap: 10px 12px;
-    align-items: end;
-    background: var(--card);
-    padding: 14px;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-
-  .create-playlist label{
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .create-playlist input,
-  .create-playlist select{
-    width: 100%;
-    padding: 9px 10px;
-    border: 1px solid rgba(120,120,160,0.25);
-    border-radius: 10px;
-    outline: none;
-    background: var(--card-strong);
-    color: var(--text);
-    transition: border .12s ease, box-shadow .12s ease;
-  }
-
-  .create-playlist input:focus,
-  .create-playlist select:focus{
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(123,108,255,0.18);
-  }
-
-  .create-playlist select[multiple]{
-    min-height: 96px;
-  }
-
-  /* bouton créer */
-  .create-playlist button[type="submit"]{
-    padding: 10px 16px;
-    border-radius: 10px;
-    border: none;
-    font-weight: 800;
-    cursor: pointer;
-    color: white;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow: 0 8px 20px rgba(123,108,255,0.35);
-    transition: transform .12s ease, filter .12s ease;
-  }
-  .create-playlist button[type="submit"]:hover{
-    transform: translateY(-1px);
-    filter: brightness(1.05);
-  }
-
-  /* === Cards playlists === */
-  .playlists-list #playlistsContainer{
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
-    gap: 12px;
-  }
-
-  .playlist-card{
-    border: none;
-    padding: 12px 12px 10px;
-    border-radius: var(--radius);
-    background: var(--card);
-    box-shadow: var(--shadow);
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-  .playlist-card:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 14px 34px rgba(22, 18, 55, 0.16);
-  }
-
-  .playlist-card h3{
-    margin: 2px 0 6px;
-    font-size: 18px;
-    font-weight: 800;
-  }
-
-  .playlist-card p{
-    margin: 4px 0;
-    color: var(--muted);
-    font-size: 14px;
-  }
-
-  /* tags moods */
-  .tag{
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 9px;
-    margin: 2px 4px 2px 0;
-    border-radius: 999px;
-    background: linear-gradient(135deg, rgba(123,108,255,0.12), rgba(108,199,255,0.12));
-    border: 1px solid rgba(123,108,255,0.25);
-    font-size: 12px;
-    font-weight: 700;
-    color: #3a3470;
-  }
-
-  /* actions */
-  .playlist-actions{
-    display:flex;
-    gap:8px;
-    margin-top:10px;
-  }
-  .playlist-actions button{
-    flex:1;
-    padding: 8px 10px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    background: white;
-    box-shadow: inset 0 0 0 1px rgba(120,120,160,0.2);
-    transition: background .12s ease, transform .12s ease;
-  }
-  .playlist-actions button:hover{
-    background: rgba(255,255,255,0.9);
-    transform: translateY(-1px);
-  }
-  .playlist-actions button:last-child{
-    color: white;
-    background: linear-gradient(135deg, var(--danger), #ff9b9b);
-    box-shadow: 0 8px 20px rgba(255,107,107,0.35);
-  }
-
-  /* === Manage Panel === */
-  .manage-panel{
-    border: none;
-    background: var(--card);
-    border-radius: calc(var(--radius) + 2px);
-    box-shadow: var(--shadow);
-    padding: 14px;
-  }
-
-  .manage-panel h2{
-    text-align: left;
-    margin-top: 0;
-  }
-  #manageDescription{
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  .songs-list h3{
-    text-align: left;
-    margin-bottom: 6px;
-  }
-
-  /* items musiques */
-  .song-item{
-    background: rgba(255,255,255,0.95);
-    border-radius: 12px;
-    padding: 8px 10px;
-    margin: 6px 0;
-    box-shadow: inset 0 0 0 1px rgba(130,130,170,0.15);
-  }
-
-  .remove-song{
-    color: var(--danger);
-    background: rgba(255,107,107,0.12);
-    border-radius: 999px;
-    padding: 2px 8px;
-    font-size: 14px;
-    transition: background .12s ease, transform .12s ease;
-  }
-  .remove-song:hover{
-    background: rgba(255,107,107,0.2);
-    transform: scale(1.05);
-  }
-
-  /* === Add song box === */
-  #showAddSongBtn{
-    padding: 9px 12px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: 800;
-    color: white;
-    background: linear-gradient(135deg, var(--accent-3), var(--accent));
-    box-shadow: 0 8px 20px rgba(108,199,255,0.35);
-  }
-
-  #addSongBox{
-    background: rgba(255,255,255,0.85);
-    padding: 10px;
-    border-radius: 12px;
-    margin-top: 8px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  #candidateSongsSelect{
-    flex:1;
-    padding: 9px 10px;
-    border-radius: 10px;
-    border: 1px solid rgba(120,120,160,0.25);
-    background: white;
-  }
-
-  #addSelectedSongBtn{
-    padding: 9px 12px;
-    border-radius: 10px;
-    border: none;
-    font-weight: 800;
-    cursor: pointer;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: white;
-  }
-
-  /* === Responsive === */
-  @media (max-width: 760px){
+    /* === Form création === */
     .create-playlist form{
-      grid-template-columns: 1fr;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 10px 12px;
+      align-items: end;
+      background: var(--card);
+      padding: 14px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
-    #addSongBox{
-      flex-direction: column;
-      align-items: stretch;
+
+    .create-playlist label{
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
     }
+
+    .create-playlist input,
+    .create-playlist select{
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid rgba(120,120,160,0.25);
+      border-radius: 10px;
+      outline: none;
+      background: var(--card-strong);
+      color: var(--text);
+      transition: border .12s ease, box-shadow .12s ease;
+    }
+
+    .create-playlist input:focus,
+    .create-playlist select:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(123,108,255,0.18);
+    }
+
+    .create-playlist select[multiple]{
+      min-height: 96px;
+    }
+
+    /* bouton créer */
+    .create-playlist button[type="submit"]{
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 8px 20px rgba(123,108,255,0.35);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .create-playlist button[type="submit"]:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    /* === Cards playlists === */
+    .playlists-list #playlistsContainer{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+      gap: 12px;
+    }
+
+    .playlist-card{
+      border: none;
+      padding: 12px 12px 10px;
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .playlist-card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(22, 18, 55, 0.16);
+    }
+
+    .playlist-card h3{
+      margin: 2px 0 6px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .playlist-card p{
+      margin: 4px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* tags moods */
+    .tag{
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      margin: 2px 4px 2px 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(123,108,255,0.12), rgba(108,199,255,0.12));
+      border: 1px solid rgba(123,108,255,0.25);
+      font-size: 12px;
+      font-weight: 700;
+      color: #3a3470;
+    }
+
+    /* actions */
     .playlist-actions{
-      flex-direction: column;
+      display:flex;
+      gap:8px;
+      margin-top:10px;
     }
-  }
+    .playlist-actions button{
+      flex:1;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      background: white;
+      box-shadow: inset 0 0 0 1px rgba(120,120,160,0.2);
+      transition: background .12s ease, transform .12s ease;
+    }
+    .playlist-actions button:hover{
+      background: rgba(255,255,255,0.9);
+      transform: translateY(-1px);
+    }
+    .playlist-actions button:last-child{
+      color: white;
+      background: linear-gradient(135deg, var(--danger), #ff9b9b);
+      box-shadow: 0 8px 20px rgba(255,107,107,0.35);
+    }
+
+    /* === Manage Panel === */
+    .manage-panel{
+      border: none;
+      background: var(--card);
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .manage-panel h2{
+      text-align: left;
+      margin-top: 0;
+    }
+    #manageDescription{
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .songs-list h3{
+      text-align: left;
+      margin-bottom: 6px;
+    }
+
+    /* items musiques */
+    .song-item{
+      background: rgba(255,255,255,0.95);
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin: 6px 0;
+      box-shadow: inset 0 0 0 1px rgba(130,130,170,0.15);
+    }
+
+    .remove-song{
+      color: var(--danger);
+      background: rgba(255,107,107,0.12);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 14px;
+      transition: background .12s ease, transform .12s ease;
+    }
+    .remove-song:hover{
+      background: rgba(255,107,107,0.2);
+      transform: scale(1.05);
+    }
+
+    /* === Add song box === */
+    #showAddSongBtn{
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+      color: white;
+      background: linear-gradient(135deg, var(--accent-3), var(--accent));
+      box-shadow: 0 8px 20px rgba(108,199,255,0.35);
+    }
+
+    #addSongBox{
+      background: rgba(255,255,255,0.85);
+      padding: 10px;
+      border-radius: 12px;
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #candidateSongsSelect{
+      flex:1;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(120,120,160,0.25);
+      background: white;
+    }
+
+    #addSelectedSongBtn{
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+
+    /* === Responsive === */
+    @media (max-width: 760px){
+      .create-playlist form{
+        grid-template-columns: 1fr;
+      }
+      #addSongBox{
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .playlist-actions{
+        flex-direction: column;
+      }
+    }
 
   </style>
 </head>

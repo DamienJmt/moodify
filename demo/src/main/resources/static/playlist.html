@@ -1,16 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestion des Playlists</title>
-  
-  <link rel="stylesheet" href="/css/style.css" />
 
-  <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    /* small local styles to avoid touching global css too much */
+    .playlist-card { border:1px solid #ddd; padding:12px; border-radius:10px; margin:10px 0; background:#fff; }
+    .playlist-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .playlist-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+    .songs-list { margin-top:8px; }
+    .song-item { display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border-radius:8px; background:#f6f6f6; margin:6px 0; }
+    .remove-song { cursor:pointer; font-weight:700; padding:0 8px; }
+    .manage-panel { border:2px dashed #ccc; padding:12px; border-radius:12px; margin-top:16px; background:#fafafa; }
+    .tag { display:inline-block; padding:2px 8px; margin:2px; border-radius:999px; background:#eee; font-size:12px; }
+    .hidden { display:none; }
+  </style>
 </head>
 <body>
   <h1>🎵 Gestion des Playlists</h1>
+
+  <div style="margin-bottom:12px;">
+    <a href="/index.html" class="btn-playlists">← Retour au lecteur</a>
+  </div>
 
   <!-- Création playlist -->
   <section class="create-playlist">
@@ -28,55 +42,188 @@
         <option value="Romantic">Romantic</option>
         <option value="Angry">Angry</option>
         <option value="Calm">Calm</option>
+        <option value="Chill">Chill</option>
+        <option value="Sad">Sad</option>
+        <option value="Energetic">Energetic</option>
       </select>
 
       <button type="submit">Créer</button>
     </form>
   </section>
 
-  <hr />
-
-  <!-- Liste des playlists -->
-  <section class="playlist-list">
+  <!-- Liste playlists -->
+  <section class="playlists-list">
     <h2>Playlists existantes</h2>
     <div id="playlistsContainer"></div>
   </section>
 
+  <!-- Gestion d'une playlist -->
+  <section id="managePanel" class="manage-panel hidden">
+    <h2 id="manageTitle">Playlist</h2>
+    <p id="manageDescription"></p>
+    <div id="manageMoods"></div>
+
+    <div class="songs-list">
+      <h3>Musiques dans la playlist</h3>
+      <div id="songsContainer"></div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <button id="showAddSongBtn">Ajouter une musique</button>
+      <div id="addSongBox" class="hidden" style="margin-top:8px;">
+        <select id="candidateSongsSelect"></select>
+        <button id="addSelectedSongBtn">Ajouter</button>
+      </div>
+    </div>
+  </section>
+
   <script>
+    const playlistsContainer = document.getElementById("playlistsContainer");
+    const managePanel = document.getElementById("managePanel");
+    const manageTitle = document.getElementById("manageTitle");
+    const manageDescription = document.getElementById("manageDescription");
+    const manageMoods = document.getElementById("manageMoods");
+    const songsContainer = document.getElementById("songsContainer");
+    const showAddSongBtn = document.getElementById("showAddSongBtn");
+    const addSongBox = document.getElementById("addSongBox");
+    const candidateSelect = document.getElementById("candidateSongsSelect");
+    const addSelectedSongBtn = document.getElementById("addSelectedSongBtn");
+
+    let currentPlaylistId = null;
+
     async function loadPlaylists() {
-      const container = document.getElementById("playlistsContainer");
-      container.innerHTML = "Chargement...";
       const res = await fetch("/api/playlists");
       const playlists = await res.json();
 
-      container.innerHTML = "";
+      playlistsContainer.innerHTML = "";
+      if (!playlists.length) {
+        playlistsContainer.innerHTML = "<p>Aucune playlist pour le moment.</p>";
+        return;
+      }
 
       playlists.forEach(pl => {
         const div = document.createElement("div");
         div.className = "playlist-card";
 
-        div.innerHTML = `
-          <h3>${pl.name}</h3>
-          <p>${pl.description || "Aucune description"}</p>
-          <p><strong>Musiques :</strong> ${pl.songs.length}</p>
-          <button onclick="deletePlaylist('${pl.id}')">Supprimer</button>
-        `;
+        const moods = (pl.moods || []).map(m => `<span class="tag">${m}</span>`).join(" ");
+        div.innerHTML = \`
+          <h3>\${pl.name}</h3>
+          <p>\${pl.description || "Aucune description"}</p>
+          <div>\${moods || "<em>Aucune humeur</em>"}</div>
+          <p><strong>Musiques :</strong> \${(pl.songs || []).length}</p>
+          <div class="playlist-actions">
+            <button onclick="openPlaylist('\${pl.id}')">Ouvrir</button>
+            <button onclick="deletePlaylist('\${pl.id}')">Supprimer</button>
+          </div>
+        \`;
 
-        container.appendChild(div);
+        playlistsContainer.appendChild(div);
       });
     }
 
+    async function openPlaylist(id) {
+      currentPlaylistId = id;
+      const res = await fetch(\`/api/playlists/\${id}\`);
+      if (res.status === 404) return;
+      const pl = await res.json();
+
+      manageTitle.textContent = pl.name;
+      manageDescription.textContent = pl.description || "";
+      manageMoods.innerHTML = (pl.moods || []).map(m => \`<span class="tag">\${m}</span>\`).join(" ");
+
+      renderSongs(pl);
+      await loadCandidates();
+
+      managePanel.classList.remove("hidden");
+      addSongBox.classList.add("hidden");
+    }
+
+    function renderSongs(pl) {
+      songsContainer.innerHTML = "";
+      const songs = pl.songs || [];
+      if (!songs.length) {
+        songsContainer.innerHTML = "<p>Aucune musique ajoutée.</p>";
+        return;
+      }
+
+      songs.forEach(s => {
+        const item = document.createElement("div");
+        item.className = "song-item";
+        item.innerHTML = \`
+          <div>
+            <strong>\${s.title || s.name}</strong>
+            <span style="opacity:.7"> — \${s.artist || (s.artists ? s.artists.join(", ") : "")}</span>
+          </div>
+          <div class="remove-song" title="Supprimer">✖</div>
+        \`;
+        item.querySelector(".remove-song").addEventListener("click", async () => {
+          const ok = confirm("Supprimer cette musique de la playlist ?");
+          if (!ok) return;
+          await fetch(\`/api/playlists/\${currentPlaylistId}/songs/\${s.id}\`, { method: "DELETE" });
+          openPlaylist(currentPlaylistId);
+          loadPlaylists();
+        });
+        songsContainer.appendChild(item);
+      });
+    }
+
+    async function loadCandidates() {
+      if (!currentPlaylistId) return;
+      const res = await fetch(\`/api/playlists/\${currentPlaylistId}/candidates\`);
+      const candidates = await res.json();
+
+      candidateSelect.innerHTML = "";
+      if (!candidates.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Aucune musique disponible pour ces humeurs";
+        candidateSelect.appendChild(opt);
+        candidateSelect.disabled = true;
+        addSelectedSongBtn.disabled = true;
+        return;
+      }
+
+      candidateSelect.disabled = false;
+      addSelectedSongBtn.disabled = false;
+
+      candidates.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = \`\${s.title || s.name} — \${s.artist || (s.artists ? s.artists.join(", ") : "")}\`;
+        candidateSelect.appendChild(opt);
+      });
+    }
+
+    showAddSongBtn.addEventListener("click", async () => {
+      addSongBox.classList.toggle("hidden");
+      if (!addSongBox.classList.contains("hidden")) {
+        await loadCandidates();
+      }
+    });
+
+    addSelectedSongBtn.addEventListener("click", async () => {
+      const songId = candidateSelect.value;
+      if (!songId) return;
+      await fetch(\`/api/playlists/\${currentPlaylistId}/songs/\${songId}\`, { method: "POST" });
+      openPlaylist(currentPlaylistId);
+      loadPlaylists();
+    });
+
     async function deletePlaylist(id) {
-      await fetch(`/api/playlists/${id}`, { method: "DELETE" });
+      await fetch(\`/api/playlists/\${id}\`, { method: "DELETE" });
+      if (currentPlaylistId === id) {
+        managePanel.classList.add("hidden");
+        currentPlaylistId = null;
+      }
       loadPlaylists();
     }
 
     document.getElementById("createPlaylistForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-
       const name = document.getElementById("playlistName").value;
       const description = document.getElementById("playlistDescription").value;
-      const moods = Array.from(document.getElementById("playlistMoods").selectedOptions).map(o => o.value);
+      const moods = Array.from(document.getElementById("playlistMoods").selectedOptions)
+        .map(o => o.value);
 
       await fetch("/api/playlists", {
         method: "POST",

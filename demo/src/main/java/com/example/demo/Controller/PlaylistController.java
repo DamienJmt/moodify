@@ -1,6 +1,7 @@
 package com.example.demo.Controller;
 
 import com.example.demo.models.Playlist;
+import com.example.demo.models.Song;
 import com.example.demo.services.PlaylistService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -52,4 +53,25 @@ public class PlaylistController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
+
+
+    @GetMapping("/{id}/candidates")
+    public ResponseEntity<List<Song>> candidates(@PathVariable String id) {
+        Playlist pl = playlistService.getPlaylist(id);
+        if (pl == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(playlistService.getCandidateSongs(id));
+    }
+
+    @PostMapping("/{id}/songs/{songId}")
+    public ResponseEntity<Playlist> addSong(@PathVariable String id, @PathVariable String songId) {
+        Playlist updated = playlistService.addSongToPlaylist(id, songId);
+        return updated == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}/songs/{songId}")
+    public ResponseEntity<Playlist> removeSong(@PathVariable String id, @PathVariable String songId) {
+        Playlist updated = playlistService.removeSongFromPlaylist(id, songId);
+        return updated == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updated);
+    }
+
 }

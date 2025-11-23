@@ -11,6 +11,7 @@ public class Playlist {
     private String id;
     private String name;
     private String description;
+    private Set<String> moods = new HashSet<>();
 
     private final List<Song> songs = new ArrayList<>();
     private int currentIndex = 0;
@@ -32,6 +33,19 @@ public class Playlist {
         if (!this.songs.isEmpty()) currentIndex = 0;
     }
 
+
+    /** Add a song to this playlist (avoids duplicates by id). */
+    public void addSong(Song song) {
+        if (song == null) return;
+        boolean exists = songs.stream().anyMatch(s -> s != null && Objects.equals(s.getId(), song.getId()));
+        if (!exists) songs.add(song);
+    }
+
+    /** Remove a song from this playlist by id. */
+    public boolean removeSongById(String songId) {
+        if (songId == null) return false;
+        return songs.removeIf(s -> s != null && Objects.equals(s.getId(), songId));
+    }
     public List<Song> getSongs() { return songs; }
 
     public Song getCurrentSong() {
@@ -68,6 +82,12 @@ public class Playlist {
         if (!filtered.isEmpty()) {
             currentIndex = songs.indexOf(filtered.get(0));
         }
+    }
+
+    // ----- playlist moods -----
+    public Set<String> getMoods() { return moods; }
+    public void setMoods(Set<String> moods) {
+        this.moods = (moods == null) ? new HashSet<>() : new HashSet<>(moods);
     }
 
     // ----- refonte fields getters/setters -----

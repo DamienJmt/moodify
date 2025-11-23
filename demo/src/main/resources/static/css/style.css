@@ -238,3 +238,20 @@ img.play {
 .meta-item {
   white-space: nowrap;
 }
+
+
+/* Playlists button */
+.btn-playlists {
+  display: inline-block;
+  padding: 10px 16px;
+  margin: 10px 0 20px 0;
+  background: var(--primary-color);
+  color: var(--white-color);
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-playlists:hover {
+  opacity: 0.9;
+}

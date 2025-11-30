@@ -61,6 +61,20 @@
         "artists": "Korn",
         "image": "https://drive.google.com/file/d/1anhCfoI1xgPwh0k6EneUnrbgi7QiWXyP/view?usp=drive_link",
         "mood": "Angry"
+    },
+    {
+        "name": "Headlock",
+        "link": "https://www.dropbox.com/scl/fi/nzb3edji9fw2v24zla1t0/Imogen-Heap-Headlock.wav?rlkey=t7q49a70te6enzoymnayvfwo1&st=bxu3p9l9&raw=1",
+        "artists": "Imogen Heap",
+        "image": "https://drive.google.com/file/d/1anhCfoI1xgPwh0k6EneUnrbgi7QiWXyP/view?usp=drive_link",
+        "mood": "Calm"
+    },
+    {
+        "name": "PIXELATED KISSES",
+        "link": "https://www.dropbox.com/scl/fi/e1q32t7u0lt4e8kw4gofm/Joji-PIXELATED-KISSES.wav?rlkey=ggmi7zm855j1wqe35rxj5c960&st=9r308k0b&raw=1",
+        "artists": "Joji",
+        "image": "https://drive.google.com/file/d/1anhCfoI1xgPwh0k6EneUnrbgi7QiWXyP/view?usp=drive_link",
+        "mood": "Sad"
     }
     
 ]

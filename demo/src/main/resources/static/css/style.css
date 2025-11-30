@@ -255,3 +255,24 @@ img.play {
 .btn-playlists:hover {
   opacity: 0.9;
 }
+
+/* Bouton fixe en haut à gauche */
+        #changeBgBtn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(123,108,255,0.85);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+        #changeBgBtn:hover {
+            background: rgba(123,108,255,1);
+            transform: translateY(-2px);
+        }

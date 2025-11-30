@@ -213,6 +213,11 @@
       box-shadow: 0 8px 20px rgba(255,107,107,0.35);
     }
 
+    .player {
+      display: none; /* masqué par défaut */
+    }
+
+
     /* === Manage Panel === */
     .manage-panel{
       border: none;
@@ -312,17 +317,41 @@
       }
     }
 
+    .change-bg-btn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(123,108,255,0.85);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: background 0.2s ease, transform 0.1s ease;
+    }
+    .change-bg-btn:hover {
+        background: rgba(123,108,255,1);
+        transform: translateY(-2px);
+    }
+
+
   </style>
 </head>
 <body>
   <h1>🎵 Gestion des Playlists</h1>
 
+  <button id="changeBgBtn" class="change-bg-btn">Changer Background</button>
+
   <div style="margin-bottom:12px;">
-    <a th:href="@{/}" class="btn-playlists">← Retour au lecteur</a>
+    <a href="/" class="btn-playlists">← Retour au lecteur</a>
   </div>
 
   <section class="create-playlist">
     <h2>Créer une playlist</h2>
+    <br>
     <form id="createPlaylistForm">
       <label>Nom :</label>
       <input type="text" id="playlistName" required />
@@ -349,6 +378,22 @@
     <h2>Playlists existantes</h2>
     <div id="playlistsContainer"></div>
   </section>
+
+  <!-- Player audio pour lire les musiques -->
+  <div class="player" style="max-width:600px; margin:0 auto 20px; text-align:center;">
+      <button id="closePlayer" style="position:absolute; top:10px; right:10px; background:var(--danger); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;">✖</button>
+      <div class="thumbnail">
+          <img id="thumb" src="/images/default-thumb.png" alt="Thumbnail" style="width:120px; border-radius:12px;"/>
+      </div>
+      <div class="details" style="margin:8px 0;">
+          <h3 id="songTitle">Titre</h3>
+          <span id="songArtist">Artiste</span>
+      </div>
+      <audio id="audioPlayer" controls style="width:100%;">
+          <source id="audioSource" src="" type="audio/mp3">
+          Votre navigateur ne supporte pas l'audio.
+      </audio>
+  </div>
 
   <section id="managePanel" class="manage-panel hidden">
     <h2 id="manageTitle">Playlist</h2>
@@ -437,35 +482,77 @@
       addSongBox.classList.add("hidden");
     }
 
-    function renderSongs(pl) {
-      songsContainer.innerHTML = "";
-      const songs = pl.songs || [];
-      if (!songs.length) {
+    function artistsText(s) {
+    if (s.artist) return s.artist;
+    if (Array.isArray(s.artists)) return s.artists.join(", ");
+    if (typeof s.artists === "string") return s.artists;
+    return "";
+  }
+
+  function renderSongs(pl) {
+    songsContainer.innerHTML = "";
+    const songs = pl.songs || [];
+    if (!songs.length) {
         songsContainer.innerHTML = "<p>Aucune musique ajoutée.</p>";
         return;
-      }
+    }
 
-      songs.forEach(function(s) {
+    songs.forEach(function(s) {
         const item = document.createElement("div");
         item.className = "song-item";
         item.innerHTML =
-          '<div>' +
-            '<strong>' + (s.title || s.name) + '</strong>' +
-            // ✅ remplacement join -> artistsText
-            '<span style="opacity:.7"> — ' + artistsText(s) + '</span>' +
-          '</div>' +
-          '<div class="remove-song" title="Supprimer">✖</div>';
+            '<div>' +
+                '<strong>' + (s.title || s.name) + '</strong>' +
+                '<span style="opacity:.7"> — ' + artistsText(s) + '</span>' +
+            '</div>' +
+            '<div class="song-actions">' +
+                '<button class="play-song">▶️ Lire</button>' +
+                '<span class="remove-song" title="Supprimer">✖</span>' +
+            '</div>';
 
+        // Supprimer la musique
         item.querySelector(".remove-song").addEventListener("click", async function() {
-          if (!confirm("Supprimer cette musique de la playlist ?")) return;
-          await fetch("/api/playlists/" + currentPlaylistId + "/songs/" + s.id, { method: "DELETE" });
-          openPlaylist(currentPlaylistId);
-          loadPlaylists();
+            if (!confirm("Supprimer cette musique de la playlist ?")) return;
+            await fetch("/api/playlists/" + currentPlaylistId + "/songs/" + s.id, { method: "DELETE" });
+            openPlaylist(currentPlaylistId);
+            loadPlaylists();
+        });
+
+        // Lire la musique
+        item.querySelector(".play-song").addEventListener("click", function() {
+            const audioPlayer = document.getElementById("audioPlayer");
+            const audioPlayerDiv = document.querySelector(".player");
+            const audioSource = document.getElementById("audioSource");
+            const songTitle = document.getElementById("songTitle");
+            const songArtist = document.getElementById("songArtist");
+            const thumb = document.getElementById("thumb");
+
+            audioPlayerDiv.style.display = "block"; // ✅ affiche le player
+
+            audioPlayer.pause();          // Stoppe la musique précédente
+            audioSource.src = s.link;     // Dropbox URL
+            audioPlayer.load();           // Recharge la source
+            audioPlayer.play().catch(err => console.log("Lecture interrompue:", err));
+
+            songTitle.textContent = s.title || s.name;
+            songArtist.textContent = artistsText(s);
+            thumb.src = s.image || "/images/default-thumb.png";
         });
 
         songsContainer.appendChild(item);
-      });
-    }
+    });
+  }
+
+  const closePlayerBtn = document.getElementById("closePlayer");
+  const playerDiv = document.querySelector(".player");
+  const audioPlayer = document.getElementById("audioPlayer");
+
+  closePlayerBtn.addEventListener("click", function() {
+      audioPlayer.pause();        // stop la musique
+      audioPlayer.currentTime = 0; // remet au début
+      playerDiv.style.display = "none"; // cache le player
+  });
+
 
     async function loadCandidates() {
       if (!currentPlaylistId) return;
@@ -537,6 +624,34 @@
     });
 
     loadPlaylists();
+
+    // --- Background changer ---
+    const changeBgBtn = document.getElementById("changeBgBtn");
+
+    async function changeBackground() {
+        try {
+            const res = await fetch("/api/images");
+            const images = await res.json();
+
+            if (!images.length) return;
+
+            const randomImage = images[Math.floor(Math.random() * images.length)];
+
+            document.body.style.backgroundImage = `url('${randomImage}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.style.backgroundAttachment = "fixed";
+            document.body.style.backdropFilter = "blur(8px)";
+        } catch (err) {
+            console.error("Erreur background:", err);
+        }
+    }
+
+    changeBgBtn.addEventListener("click", changeBackground);
+
+    // Charger un fond initial automatiquement
+    changeBackground();
+
   </script>
 </body>
 </html>

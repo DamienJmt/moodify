@@ -14,6 +14,9 @@
 </head>
 <body>
 
+    <!-- Bouton pour changer le background -->
+    <button id="changeBgBtn">Changer Background</button>
+
     <!-- Sélecteur de chansons -->
     <select id="songSelector">
         <option value="">-- Choisir une chanson --</option>
@@ -26,13 +29,13 @@
         <option value="Romantic">Romantic</option>
         <option value="Angry">Angry</option>
         <option value="Calm">Calm</option>
+        <option value="Sad">Sad</option>
+        <option value="Chill">Chill</option>
+        <option value="Energetic">Energetic</option>
     </select>
 
     <!-- Bouton playlists -->
     <a href="/playlist.html" class="btn-playlists">📂 Mes playlists</a>
-
-
-
 
     <!-- Lecteur -->
     <div class="player">
@@ -82,6 +85,25 @@
 
     <!-- JS -->
     <script type="module" th:src="@{/js/script.js}"></script>
+    <script type="module">
+        // Fonction pour changer le background
+        const changeBgBtn = document.getElementById("changeBgBtn");
+
+        async function changeBackground() {
+            try {
+                const res = await fetch("/api/images");
+                const images = await res.json();
+                if (images.length === 0) return;
+
+                const randomImage = images[Math.floor(Math.random() * images.length)];
+                document.body.style.backgroundImage = `url('${randomImage}')`;
+            } catch(err) {
+                console.error("Erreur lors du changement de background:", err);
+            }
+        }
+
+        changeBgBtn.addEventListener("click", changeBackground);
+    </script>
 
 </body>
 </html>

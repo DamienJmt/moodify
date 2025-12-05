@@ -276,3 +276,131 @@ img.play {
             background: rgba(123,108,255,1);
             transform: translateY(-2px);
         }
+
+/* ----- TABS ----- */
+.tabs {
+    margin-top: 70px;
+    display: flex;
+    gap: 10px;
+}
+
+.tab {
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    backdrop-filter: blur(6px);
+    transition: 0.2s;
+}
+
+.tab.active {
+    background: rgba(255,255,255,0.5);
+}
+
+.tab:hover {
+    background: rgba(255,255,255,0.35);
+}
+
+.tab-content {
+    display: none;
+    margin-top: 20px;
+}
+
+.tab-content.visible {
+    display: block;
+}
+
+/* Bouton d'accès aux playlists dans les tabs */
+.btn-open-playlists {
+    display: inline-block;
+    padding: 10px 16px;
+    background: var(--primary-color);
+    color: var(--white-color);
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    margin-bottom: 10px;
+    transition: 0.2s ease;
+}
+
+.btn-open-playlists:hover {
+    opacity: 0.85;
+    transform: scale(1.05);
+}
+
+/* Cartes playlists */
+.playlist-item {
+    background: #1e1e1e;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    transition: 0.25s ease;
+    cursor: pointer;
+}
+
+.playlist-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Titre playlist */
+.playlist-item h4 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    color: var(--primary-color);
+}
+
+/* Description */
+.playlist-item p {
+    margin: 0 0 12px;
+    opacity: 0.75;
+}
+
+/* Bouton ouvrir */
+.playlist-item button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.playlist-item button:hover {
+    opacity: 0.85;
+    transform: scale(1.05);
+}
+
+.playlist-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.playlist-actions button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.playlist-actions .open-playlist {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.playlist-actions .play-playlist {
+    background: var(--primary-color);
+    color: white;
+}
+
+
+

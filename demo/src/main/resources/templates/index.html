@@ -17,25 +17,43 @@
     <!-- Bouton pour changer le background -->
     <button id="changeBgBtn">Changer Background</button>
 
-    <!-- Sélecteur de chansons -->
-    <select id="songSelector">
-        <option value="">-- Choisir une chanson --</option>
-    </select>
+    <div class="tabs">
+        <button class="tab active" data-target="tab-music">🎵 Musiques</button>
+        <button class="tab" data-target="tab-playlists">📂 Playlists</button>
+        <button class="tab" data-target="tab-moods">😊 Humeurs</button>
+    </div>
 
-    <!-- Sélecteur d’humeur -->
-    <select id="moodSelector">
-        <option value="">-- Choisir une humeur --</option>
-        <option value="Happy">Happy</option>
-        <option value="Romantic">Romantic</option>
-        <option value="Angry">Angry</option>
-        <option value="Calm">Calm</option>
-        <option value="Sad">Sad</option>
-        <option value="Chill">Chill</option>
-        <option value="Energetic">Energetic</option>
-    </select>
 
-    <!-- Bouton playlists -->
-    <a href="/playlist.html" class="btn-playlists">📂 Mes playlists</a>
+    <!-- ONGLET MUSIQUES -->
+    <div id="tab-music" class="tab-content visible">
+        <select id="songSelector">
+            <option value="">-- Choisir une chanson --</option>
+        </select>
+    </div>
+
+    <!-- ONGLET PLAYLISTS -->
+    <div id="tab-playlists" class="tab-content">
+        <button id="openPlaylistsPage" class="btn-open-playlists">
+            📂 Mes playlists
+        </button>
+
+        <div id="playlistsContainer"></div>
+    </div>
+
+    <!-- ONGLET HUMEURS -->
+    <div id="tab-moods" class="tab-content">
+        <select id="moodSelector">
+            <option value="">-- Choisir une humeur --</option>
+            <option value="Happy">Happy</option>
+            <option value="Romantic">Romantic</option>
+            <option value="Angry">Angry</option>
+            <option value="Calm">Calm</option>
+            <option value="Sad">Sad</option>
+            <option value="Chill">Chill</option>
+            <option value="Energetic">Energetic</option>
+        </select>
+    </div>
+
 
     <!-- Lecteur -->
     <div class="player">
@@ -101,8 +119,40 @@
                 console.error("Erreur lors du changement de background:", err);
             }
         }
+        
+        let currentPlaylist = [];
+        let currentSongIndex = 0;
+
+            const playlistToPlay = localStorage.getItem("playlistToPlay");
+
+            if (playlistToPlay) {
+            const songs = JSON.parse(playlistToPlay);
+
+            currentPlaylist = songs;
+            currentSongIndex = 0;
+
+            // Charger la première chanson de la playlist
+            const firstSong = currentPlaylist[currentSongIndex];
+
+            const songElement = document.querySelector("#song");
+            const titleElement = document.querySelector("#title");
+            const artistElement = document.querySelector("#artist");
+            const thumbElement = document.querySelector("#thumb");
+
+            songElement.src = firstSong.link;
+            titleElement.textContent = firstSong.name;
+            artistElement.textContent = firstSong.artists;
+            thumbElement.src = firstSong.image;
+
+            // Jouer la musique
+            songElement.play().catch(() => {});
+
+            localStorage.removeItem("playlistToPlay");
+
+    }
 
         changeBgBtn.addEventListener("click", changeBackground);
+
     </script>
 
 </body>

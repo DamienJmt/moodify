@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestion des Playlists</title>
+
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .playlist-card { border:1px solid #ddd; padding:12px; border-radius:10px; margin:10px 0; background:#fff; }
+    .playlist-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .playlist-actions button { padding:8px 12px; border-radius:8px; border:none; cursor:pointer; }
+    .songs-list { margin-top:8px; }
+    .song-item { display:flex; align-items:center; justify-content:space-between; padding:6px 8px; border-radius:8px; background:#f6f6f6; margin:6px 0; }
+    .remove-song { cursor:pointer; font-weight:700; padding:0 8px; }
+    .manage-panel { border:2px dashed #ccc; padding:12px; border-radius:12px; margin-top:16px; background:#fafafa; }
+    .tag { display:inline-block; padding:2px 8px; margin:2px; border-radius:999px; background:#eee; font-size:12px; }
+    .hidden { display:none; }
+
+    /* === Palette basée sur ton fond pastel === */
+    :root{
+      --bg-1: rgba(255, 255, 255, 0.10);
+      --bg-2: rgba(255, 255, 255, 0.18);
+      --card: rgba(255, 255, 255, 0.75);
+      --card-strong: rgba(255, 255, 255, 0.9);
+      --text: #1f1f2e;
+      --muted: #5c5c78;
+      --accent: #7b6cff;     /* violet doux */
+      --accent-2: #ff8ccf;   /* rose doux */
+      --accent-3: #6cc7ff;   /* bleu doux */
+      --danger: #ff6b6b;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(22, 18, 55, 0.12);
+    }
+
+    /* === Layout global === */
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      margin: 0;
+      padding: 30px 16px 60px;
+      background: transparent; /* ton fond est déjà sur index */
+    }
+
+    h1, h2, h3{
+      text-align: center;
+      letter-spacing: .3px;
+    }
+
+    h1{
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 18px;
+      text-shadow: 0 2px 8px rgba(255,255,255,0.6);
+    }
+
+    section{
+      width: min(920px, 100%);
+      margin: 0 auto 18px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: var(--bg-1);
+      backdrop-filter: blur(6px);
+    }
+
+    /* === Bouton retour === */
+    .btn-playlists{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--bg-2);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      transition: transform .12s ease, background .12s ease;
+    }
+    .btn-playlists:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.28);
+    }
+
+    /* === Form création === */
+    .create-playlist form{
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 10px 12px;
+      align-items: end;
+      background: var(--card);
+      padding: 14px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .create-playlist label{
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .create-playlist input,
+    .create-playlist select{
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid rgba(120,120,160,0.25);
+      border-radius: 10px;
+      outline: none;
+      background: var(--card-strong);
+      color: var(--text);
+      transition: border .12s ease, box-shadow .12s ease;
+    }
+
+    .create-playlist input:focus,
+    .create-playlist select:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(123,108,255,0.18);
+    }
+
+    .create-playlist select[multiple]{
+      min-height: 96px;
+    }
+
+    /* bouton créer */
+    .create-playlist button[type="submit"]{
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 8px 20px rgba(123,108,255,0.35);
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .create-playlist button[type="submit"]:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    /* === Cards playlists === */
+    .playlists-list #playlistsContainer{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+      gap: 12px;
+    }
+
+    .playlist-card{
+      border: none;
+      padding: 12px 12px 10px;
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .playlist-card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 14px 34px rgba(22, 18, 55, 0.16);
+    }
+
+    .playlist-card h3{
+      margin: 2px 0 6px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .playlist-card p{
+      margin: 4px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* tags moods */
+    .tag{
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      margin: 2px 4px 2px 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(123,108,255,0.12), rgba(108,199,255,0.12));
+      border: 1px solid rgba(123,108,255,0.25);
+      font-size: 12px;
+      font-weight: 700;
+      color: #3a3470;
+    }
+
+    /* actions */
+    .playlist-actions{
+      display:flex;
+      gap:8px;
+      margin-top:10px;
+    }
+    .playlist-actions button{
+      flex:1;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      background: white;
+      box-shadow: inset 0 0 0 1px rgba(120,120,160,0.2);
+      transition: background .12s ease, transform .12s ease;
+    }
+    .playlist-actions button:hover{
+      background: rgba(255,255,255,0.9);
+      transform: translateY(-1px);
+    }
+    .playlist-actions button:last-child{
+      color: white;
+      background: linear-gradient(135deg, var(--danger), #ff9b9b);
+      box-shadow: 0 8px 20px rgba(255,107,107,0.35);
+    }
+
+    .player {
+      display: none; /* masqué par défaut */
+    }
+
+
+    /* === Manage Panel === */
+    .manage-panel{
+      border: none;
+      background: var(--card);
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .manage-panel h2{
+      text-align: left;
+      margin-top: 0;
+    }
+    #manageDescription{
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .songs-list h3{
+      text-align: left;
+      margin-bottom: 6px;
+    }
+
+    /* items musiques */
+    .song-item{
+      background: rgba(255,255,255,0.95);
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin: 6px 0;
+      box-shadow: inset 0 0 0 1px rgba(130,130,170,0.15);
+    }
+
+    .remove-song{
+      color: var(--danger);
+      background: rgba(255,107,107,0.12);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 14px;
+      transition: background .12s ease, transform .12s ease;
+    }
+    .remove-song:hover{
+      background: rgba(255,107,107,0.2);
+      transform: scale(1.05);
+    }
+
+    /* === Add song box === */
+    #showAddSongBtn{
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+      color: white;
+      background: linear-gradient(135deg, var(--accent-3), var(--accent));
+      box-shadow: 0 8px 20px rgba(108,199,255,0.35);
+    }
+
+    #addSongBox{
+      background: rgba(255,255,255,0.85);
+      padding: 10px;
+      border-radius: 12px;
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #candidateSongsSelect{
+      flex:1;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(120,120,160,0.25);
+      background: white;
+    }
+
+    #addSelectedSongBtn{
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+
+    /* === Responsive === */
+    @media (max-width: 760px){
+      .create-playlist form{
+        grid-template-columns: 1fr;
+      }
+      #addSongBox{
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .playlist-actions{
+        flex-direction: column;
+      }
+    }
+
+    .change-bg-btn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(123,108,255,0.85);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: background 0.2s ease, transform 0.1s ease;
+    }
+    .change-bg-btn:hover {
+        background: rgba(123,108,255,1);
+        transform: translateY(-2px);
+    }
+
+
+  </style>
+</head>
+<body>
+  <h1>🎵 Gestion des Playlists</h1>
+
+  <button id="changeBgBtn" class="change-bg-btn">Changer Background</button>
+
+  <div style="margin-bottom:12px;">
+    <a href="/" class="btn-playlists">← Retour au lecteur</a>
+  </div>
+
+  <section class="create-playlist">
+    <h2>Créer une playlist</h2>
+    <br>
+    <form id="createPlaylistForm">
+      <label>Nom :</label>
+      <input type="text" id="playlistName" required />
+
+      <label>Description :</label>
+      <input type="text" id="playlistDescription" />
+
+      <label>Humeurs :</label>
+      <select id="playlistMoods" multiple>
+        <option value="Happy">Happy</option>
+        <option value="Romantic">Romantic</option>
+        <option value="Angry">Angry</option>
+        <option value="Calm">Calm</option>
+        <option value="Chill">Chill</option>
+        <option value="Sad">Sad</option>
+        <option value="Energetic">Energetic</option>
+      </select>
+
+      <button type="submit">Créer</button>
+    </form>
+  </section>
+
+  <section class="playlists-list">
+    <h2>Playlists existantes</h2>
+    <div id="playlistsContainer"></div>
+  </section>
+
+  <!-- Player audio pour lire les musiques -->
+  <div class="player" style="max-width:600px; margin:0 auto 20px; text-align:center;">
+      <button id="closePlayer" style="position:absolute; top:10px; right:10px; background:var(--danger); color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer;">✖</button>
+      <div class="thumbnail">
+          <img id="thumb" src="/images/default-thumb.png" alt="Thumbnail" style="width:120px; border-radius:12px;"/>
+      </div>
+      <div class="details" style="margin:8px 0;">
+          <h3 id="songTitle">Titre</h3>
+          <span id="songArtist">Artiste</span>
+      </div>
+      <audio id="audioPlayer" controls style="width:100%;">
+          <source id="audioSource" src="" type="audio/mp3">
+          Votre navigateur ne supporte pas l'audio.
+      </audio>
+  </div>
+
+  <section id="managePanel" class="manage-panel hidden">
+    <h2 id="manageTitle">Playlist</h2>
+    <p id="manageDescription"></p>
+    <div id="manageMoods"></div>
+
+    <div class="songs-list">
+      <h3>Musiques dans la playlist</h3>
+      <div id="songsContainer"></div>
+    </div>
+
+    <div style="margin-top:10px;">
+      <button id="showAddSongBtn">Ajouter une musique</button>
+      <div id="addSongBox" class="hidden" style="margin-top:8px;">
+        <select id="candidateSongsSelect"></select>
+        <button id="addSelectedSongBtn">Ajouter</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const playlistsContainer = document.getElementById("playlistsContainer");
+    const managePanel = document.getElementById("managePanel");
+    const manageTitle = document.getElementById("manageTitle");
+    const manageDescription = document.getElementById("manageDescription");
+    const manageMoods = document.getElementById("manageMoods");
+    const songsContainer = document.getElementById("songsContainer");
+    const showAddSongBtn = document.getElementById("showAddSongBtn");
+    const addSongBox = document.getElementById("addSongBox");
+    const candidateSelect = document.getElementById("candidateSongsSelect");
+    const addSelectedSongBtn = document.getElementById("addSelectedSongBtn");
+
+    let currentPlaylistId = null;
+
+    // ✅ FIX compat luca/refonte : artists peut être string, array, ou absent
+    function artistsText(s) {
+      if (s.artist) return s.artist; // nouveau modèle
+      if (Array.isArray(s.artists)) return s.artists.join(", "); // ancien modèle array
+      if (typeof s.artists === "string") return s.artists; // ancien modèle string
+      return "";
+    }
+
+    async function loadPlaylists() {
+      const res = await fetch("/api/playlists");
+      const playlists = await res.json();
+
+      playlistsContainer.innerHTML = "";
+      if (!playlists.length) {
+        playlistsContainer.innerHTML = "<p>Aucune playlist pour le moment.</p>";
+        return;
+      }
+
+      playlists.forEach(function(pl) {
+        const div = document.createElement("div");
+        div.className = "playlist-card";
+
+        const moods = (pl.moods || []).map(function(m){ return '<span class="tag">' + m + '</span>'; }).join(" ");
+        div.innerHTML =
+          '<h3>' + pl.name + '</h3>' +
+          '<p>' + (pl.description || "Aucune description") + '</p>' +
+          '<div>' + (moods || "<em>Aucune humeur</em>") + '</div>' +
+          '<p><strong>Musiques :</strong> ' + ((pl.songs || []).length) + '</p>' +
+          '<div class="playlist-actions">' +
+            '<button onclick="openPlaylist(\'' + pl.id + '\')">Ouvrir</button>' +
+            '<button onclick="deletePlaylist(\'' + pl.id + '\')">Supprimer</button>' +
+          '</div>';
+
+        playlistsContainer.appendChild(div);
+      });
+    }
+
+    async function openPlaylist(id) {
+      currentPlaylistId = id;
+      const res = await fetch("/api/playlists/" + id);
+      if (res.status === 404) return;
+      const pl = await res.json();
+
+      manageTitle.textContent = pl.name;
+      manageDescription.textContent = pl.description || "";
+      manageMoods.innerHTML = (pl.moods || []).map(function(m){ return '<span class="tag">' + m + '</span>'; }).join(" ");
+
+      renderSongs(pl);
+      await loadCandidates();
+
+      managePanel.classList.remove("hidden");
+      addSongBox.classList.add("hidden");
+    }
+
+    function artistsText(s) {
+    if (s.artist) return s.artist;
+    if (Array.isArray(s.artists)) return s.artists.join(", ");
+    if (typeof s.artists === "string") return s.artists;
+    return "";
+  }
+
+  function renderSongs(pl) {
+    songsContainer.innerHTML = "";
+    const songs = pl.songs || [];
+    if (!songs.length) {
+        songsContainer.innerHTML = "<p>Aucune musique ajoutée.</p>";
+        return;
+    }
+
+    songs.forEach(function(s) {
+        const item = document.createElement("div");
+        item.className = "song-item";
+        item.innerHTML =
+            '<div>' +
+                '<strong>' + (s.title || s.name) + '</strong>' +
+                '<span style="opacity:.7"> — ' + artistsText(s) + '</span>' +
+            '</div>' +
+            '<div class="song-actions">' +
+                '<button class="play-song">▶️ Lire</button>' +
+                '<span class="remove-song" title="Supprimer">✖</span>' +
+            '</div>';
+
+        // Supprimer la musique
+        item.querySelector(".remove-song").addEventListener("click", async function() {
+            if (!confirm("Supprimer cette musique de la playlist ?")) return;
+            await fetch("/api/playlists/" + currentPlaylistId + "/songs/" + s.id, { method: "DELETE" });
+            openPlaylist(currentPlaylistId);
+            loadPlaylists();
+        });
+
+        // Lire la musique
+        item.querySelector(".play-song").addEventListener("click", function() {
+            const audioPlayer = document.getElementById("audioPlayer");
+            const audioPlayerDiv = document.querySelector(".player");
+            const audioSource = document.getElementById("audioSource");
+            const songTitle = document.getElementById("songTitle");
+            const songArtist = document.getElementById("songArtist");
+            const thumb = document.getElementById("thumb");
+
+            audioPlayerDiv.style.display = "block"; // ✅ affiche le player
+
+            audioPlayer.pause();          // Stoppe la musique précédente
+            audioSource.src = s.link;     // Dropbox URL
+            audioPlayer.load();           // Recharge la source
+            audioPlayer.play().catch(err => console.log("Lecture interrompue:", err));
+
+            songTitle.textContent = s.title || s.name;
+            songArtist.textContent = artistsText(s);
+            thumb.src = s.image || "/images/default-thumb.png";
+        });
+
+        songsContainer.appendChild(item);
+    });
+  }
+
+  const closePlayerBtn = document.getElementById("closePlayer");
+  const playerDiv = document.querySelector(".player");
+  const audioPlayer = document.getElementById("audioPlayer");
+
+  closePlayerBtn.addEventListener("click", function() {
+      audioPlayer.pause();        // stop la musique
+      audioPlayer.currentTime = 0; // remet au début
+      playerDiv.style.display = "none"; // cache le player
+  });
+
+
+    async function loadCandidates() {
+      if (!currentPlaylistId) return;
+      const res = await fetch("/api/playlists/" + currentPlaylistId + "/candidates");
+      const candidates = await res.json();
+
+      candidateSelect.innerHTML = "";
+      if (!candidates.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Aucune musique disponible pour ces humeurs";
+        candidateSelect.appendChild(opt);
+        candidateSelect.disabled = true;
+        addSelectedSongBtn.disabled = true;
+        return;
+      }
+
+      candidateSelect.disabled = false;
+      addSelectedSongBtn.disabled = false;
+
+      candidates.forEach(function(s) {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        // ✅ remplacement join -> artistsText
+        opt.textContent = (s.title || s.name) + " - " + artistsText(s);
+        candidateSelect.appendChild(opt);
+      });
+    }
+
+    showAddSongBtn.addEventListener("click", async function() {
+      addSongBox.classList.toggle("hidden");
+      if (!addSongBox.classList.contains("hidden")) {
+        await loadCandidates();
+      }
+    });
+
+    addSelectedSongBtn.addEventListener("click", async function() {
+      const songId = candidateSelect.value;
+      if (!songId) return;
+      await fetch("/api/playlists/" + currentPlaylistId + "/songs/" + songId, { method: "POST" });
+      openPlaylist(currentPlaylistId);
+      loadPlaylists();
+    });
+
+    async function deletePlaylist(id) {
+      await fetch("/api/playlists/" + id, { method: "DELETE" });
+      if (currentPlaylistId === id) {
+        managePanel.classList.add("hidden");
+        currentPlaylistId = null;
+      }
+      loadPlaylists();
+    }
+
+    document.getElementById("createPlaylistForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const name = document.getElementById("playlistName").value;
+      const description = document.getElementById("playlistDescription").value;
+      const moods = Array.from(document.getElementById("playlistMoods").selectedOptions)
+        .map(function(o){ return o.value; });
+
+      await fetch("/api/playlists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name, description: description, moods: moods })
+      });
+
+      e.target.reset();
+      loadPlaylists();
+    });
+
+    loadPlaylists();
+
+    // --- Background changer ---
+    const changeBgBtn = document.getElementById("changeBgBtn");
+
+    async function changeBackground() {
+        try {
+            const res = await fetch("/api/images");
+            const images = await res.json();
+
+            if (!images.length) return;
+
+            const randomImage = images[Math.floor(Math.random() * images.length)];
+
+            document.body.style.backgroundImage = `url('${randomImage}')`;
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.style.backgroundAttachment = "fixed";
+            document.body.style.backdropFilter = "blur(8px)";
+        } catch (err) {
+            console.error("Erreur background:", err);
+        }
+    }
+
+    changeBgBtn.addEventListener("click", changeBackground);
+
+    // Charger un fond initial automatiquement
+    changeBackground();
+
+  </script>
+</body>
+</html>

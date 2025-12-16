@@ -56,6 +56,28 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.2.5</version>
+
+            <configuration>
+                <!-- Affiche chaque test exécuté -->
+                <printSummary>true</printSummary>
+
+                <!-- Détails des tests -->
+                <reportFormat>brief</reportFormat>
+
+                <!-- Stacktrace complète -->
+                <trimStackTrace>false</trimStackTrace>
+
+                <!-- Affiche les tests réussis -->
+                <redirectTestOutputToFile>false</redirectTestOutputToFile>
+
+                <!-- Format lisible -->
+                <useFile>false</useFile>
+            </configuration>
+        </plugin>
         </plugins>
     </build>
 

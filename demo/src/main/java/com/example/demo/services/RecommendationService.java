@@ -10,6 +10,9 @@ import java.util.*;
  */
 @Service
 public class RecommendationService {
+
+    public RecommendationService() {
+    }
     private final Random random = new Random();
     private final Deque<String> recent = new ArrayDeque<>();
 

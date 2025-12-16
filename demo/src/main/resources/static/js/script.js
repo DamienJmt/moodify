@@ -1,6 +1,9 @@
 // ============================
 // Initialisation du lecteur
 // ============================
+window.currentPlaylist = null;
+window.currentSongIndex = 0;
+
 async function initPlayer() {
   const songs = await fetch("/api/songs").then(res => res.json());
   if (!songs || songs.length === 0) {
@@ -91,27 +94,18 @@ async function initPlayer() {
 
   function changeSong(increment) {
     if (window.currentPlaylist && window.currentPlaylist.length > 0) {
-        window.currentSongIndex = (window.currentSongIndex + increment + window.currentPlaylist.length) % window.currentPlaylist.length;
-        const track = window.currentPlaylist[window.currentSongIndex];
+        window.currentSongIndex =
+            (window.currentSongIndex + increment + window.currentPlaylist.length)
+            % window.currentPlaylist.length;
 
-        const songElement = document.querySelector("#song");
-        const title = document.querySelector("#title");
-        const artist = document.querySelector("#artist");
-        const thumb = document.querySelector("#thumb");
-
-        songElement.src = track.link;
-        title.textContent = track.name;
-        artist.textContent = track.artists;
-        thumb.src = track.image;
-
-        songElement.play().catch(() => {});
+        loadTrack(window.currentPlaylist[window.currentSongIndex]);
+        song.play().catch(() => {});
     } else {
-        // Sinon, comportement normal avec songs[]
         index = (index + increment + songs.length) % songs.length;
         setSongDetails(index);
         song.play().catch(() => {});
     }
-  }
+}
 
 
   function playPause() {
@@ -218,30 +212,24 @@ async function initPlayer() {
   // ============================
   // Initialisation du premier morceau
   // ============================
-  setSongDetails(index);
-  //
   const playlistToPlay = localStorage.getItem("playlistToPlay");
+  console.log("PLAYLIST AU DÉMARRAGE :", playlistToPlay);
 
   if (playlistToPlay) {
-      const songs = JSON.parse(playlistToPlay);
-
-      window.currentPlaylist = songs;
+      window.currentPlaylist = JSON.parse(playlistToPlay);
       window.currentSongIndex = 0;
 
-      // Charger la première chanson
-      setSongDetails(0); // utilise la fonction existante d'initPlayer
+      loadTrack(window.currentPlaylist[0]);
 
-      const songElement = document.querySelector("#song");
-      songElement.play().catch(() => {});
+      song.play().catch(err => console.error("PLAY ERROR", err));
 
-      // Mettre à jour le selecteur si besoin
-      const songSelector = document.getElementById("songSelector");
-      if (songSelector) songSelector.value = 0;
+      playBtn.classList.add("hidden");
+      pauseBtn.classList.remove("hidden");
 
       localStorage.removeItem("playlistToPlay");
   }
-
 }
+
 
 async function loadPlaylists() {
     const container = document.getElementById("playlistsContainer");
@@ -279,25 +267,19 @@ async function loadPlaylists() {
 
             // Bouton "Lire la playlist"
             div.querySelector(".play-playlist").addEventListener("click", async (e) => {
-                e.stopPropagation();
+              e.stopPropagation();
 
-                try {
-                    const playlist = await fetch(`/api/playlists/${pl.id}`).then(res => res.json());
+              const playlist = await fetch(`/api/playlists/${pl.id}`).then(res => res.json());
 
-                    if (!playlist.songs || playlist.songs.length === 0) {
-                        alert("Aucune musique dans cette playlist.");
-                        return;
-                    }
+              console.log("PLAYLIST RECUE :", playlist);
+              console.log("SONGS :", playlist.songs);
 
-                    // Envoyer la playlist entière au lecteur principal
-                    localStorage.setItem("playlistToPlay", JSON.stringify(playlist.songs));
+              localStorage.setItem("playlistToPlay", JSON.stringify(playlist.songs));
 
-                    // Redirection vers lecteur
-                    window.location.href = "/";
-                } catch (err) {
-                    console.error(err);
-                }
-            });
+              console.log("LOCALSTORAGE JUSTE AVANT REDIRECT :", localStorage.getItem("playlistToPlay"));
+
+              window.location.href = "/";
+          });
 
             container.appendChild(div);
         });
@@ -332,6 +314,22 @@ document.getElementById("openPlaylistsPage").addEventListener("click", () => {
     window.location.href = "/playlist.html";
 });
 
+function loadTrack(track) {
+    const song = document.getElementById("song");
+    const title = document.getElementById("title");
+    const artist = document.getElementById("artist");
+    const thumb = document.getElementById("thumb");
+
+    song.src = track.link;
+    title.textContent = track.name;
+    artist.textContent = track.artists;
+    thumb.src = track.image;
+
+    song.load();
+}
+
+console.log(window.currentPlaylist);
+console.log(document.getElementById("song").src);
 
 // Lancement
 initPlayer().catch(err => console.error(err));
